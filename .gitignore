@@ -1,4 +1,4 @@
 /target
-/tmp
-/.idea
-/.env
+tmp/
+.idea
+.env
