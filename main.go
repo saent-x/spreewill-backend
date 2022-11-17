@@ -69,5 +69,5 @@ func main() {
 
 	port := os.Getenv("PORT")
 	log.Printf("server started @ %s...", port)
-	http.ListenAndServe(fmt.Sprintf(":%s", port), r)
+	http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", port), r)
 }
