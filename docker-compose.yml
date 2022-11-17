@@ -1,14 +1,14 @@
 version: "3.3"
 
 services:
-#  web:
-#    build: .
-#    ports:
-#      - 8080:8080
-#    depends_on:
-#      - mongo
-#    env_file:
-#      - .env
+  web:
+    build: .
+    ports:
+       - 8080:8080
+    depends_on:
+      - mongo
+    env_file:
+      - .env
   mongo:
     image: mongo
     restart: always
