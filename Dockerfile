@@ -1,12 +1,11 @@
-FROM golang
+# syntax=docker/dockerfile:1
 
-RUN mkdir /app
-
-ADD . /app
+FROM golang:1.19-alpine
 
 WORKDIR /app
+COPY . .
 
-RUN go build -o main .
+RUN go get -d -v
+RUN go build -v
 
-EXPOSE 8080
-CMD ["/app/main"]
+CMD ["./spreewill-core"]

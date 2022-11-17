@@ -1,14 +1,37 @@
 version: "3.3"
 
 services:
-  web:
-    build: .
+#  web:
+#    build: .
+#    ports:
+#      - 8080:8080
+#    depends_on:
+#      - mongo
+#    env_file:
+#      - .env
+  mongo:
+    image: mongo
+    restart: always
     ports:
-      - "8080:8080"
+      - 27018:27017
+    env_file:
+      - .env
+    volumes:
+      - ./database:/data/db
     environment:
-      PORT: 8080
-      AWS_ACCESS_KEY_ID: AKIASPXOW53KEPXAVPD3
-      AWS_SECRET_ACCESS_KEY: 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
-      AWS_DEFAULT_REGION: us-east-2
-      COGNITO_APP_CLIENT_ID: 5e728osp5d80kki1bhnh7ru9h0
-      COGNITO_USER_POOL_ID: us-east-2_DVMVjSQFk
+      MONGO_INITDB_ROOT_USERNAME: $DB_USER
+      MONGO_INITDB_ROOT_PASSWORD: $DB_PASSWORD
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    depends_on:
+      - mongo
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: $DB_USER
+      ME_CONFIG_MONGODB_ADMINPASSWORD: $DB_PASSWORD
+      ME_CONFIG_BASICAUTH_USERNAME: $BA_USERNAME
+      ME_CONFIG_BASICAUTH_PASSWORD: $BA_PASSWORD
+      ME_CONFIG_MONGODB_URL: mongodb://$DB_USER:$DB_PASSWORD@mongo:27017/

@@ -1,56 +1,73 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"spreewill-core/pkg/auth"
+	"spreewill-core/pkg/db"
+	"spreewill-core/pkg/services/auth"
+	"spreewill-core/pkg/services/customer"
+	"spreewill-core/pkg/services/vendorx"
+	"spreewill-core/pkg/session"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/jwtauth/v5"
-	"github.com/lestrrat-go/jwx/jwk"
-	"github.com/lestrrat-go/jwx/jwt"
+	"github.com/joho/godotenv"
 )
 
-var tokenAuth *jwtauth.JWTAuth
-
-func init() {
-	pubKeyURL := "https://cognito-idp.%s.amazonaws.com/%s/.well-known/jwks.json"
-	formattedURL := fmt.Sprintf(pubKeyURL, os.Getenv("AWS_DEFAULT_REGION"), os.Getenv("COGNITO_USER_POOL_ID"))
-
-	pubKey, err := jwk.Fetch(context.Background(), formattedURL)
+func main() {
+	err := godotenv.Load()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal("Error loading .env file")
 	}
 
-	tokenAuth = jwtauth.New("HS256", jwt.WithKeySet(pubKey), nil)
-	jwt.Parse()
-
-	_, tokenString, _ := tokenAuth.Encode(map[string]interface{}{"user_id": 123})
-	fmt.Printf("DEBUG: a sample jwt is %s\n\n", tokenString)
-}
-
-func main() {
 	cognitoClient := auth.Init()
+	db.Init()
+
+	session := session.CreateSession()
+
+	vendorService := vendorx.NewVendorService(session)
+	customerService := customer.NewCustomerService(session)
 
 	r := chi.NewRouter()
 
+	// pass database to context too
 	r.Use(middleware.Logger, middleware.WithValue("CognitoClient", cognitoClient))
 
-	r.Route("/auth", func(r chi.Router) {
-		r.Use(jwtauth.Verifier(tokenAuth))
-		r.Use(jwtauth.Authenticator)
-
+	r.Route("/api/auth", func(r chi.Router) {
 		r.Post("/signup", auth.SignUp)
 		r.Post("/verify", auth.VerifyUser)
 		r.Post("/signin", auth.SignIn)
 	})
 
-	r.NotFoundHandler()
-	port := os.Getenv("PORT")
+	r.Route("/api/vendor", func(r chi.Router) {
+		r.Post("/", vendorService.CreateVendor)
 
+		r.Group(func(r chi.Router) {
+			r.Use(ValidateToken)
+
+			r.Get("/{id}", vendorService.GetVendor)
+			r.Get("/all", vendorService.GetVendors)
+			r.Put("/", vendorService.UpdateVendor)
+			r.Delete("/{id}", vendorService.DeleteVendor)
+		})
+	})
+
+	r.Route("/api/customer", func(r chi.Router) {
+		r.Post("/", customerService.CreateCustomer)
+
+		r.Group(func(r chi.Router) {
+			r.Use(ValidateToken)
+
+			r.Get("/{id}", customerService.GetCustomer)
+			r.Get("/all", customerService.GetCustomers)
+			r.Put("/", customerService.UpdateCustomer)
+			r.Delete("/{id}", customerService.DeleteCustomer)
+		})
+	})
+
+	port := os.Getenv("PORT")
+	log.Printf("server started @ %s...", port)
 	http.ListenAndServe(fmt.Sprintf(":%s", port), r)
 }
