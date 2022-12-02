@@ -2,15 +2,18 @@ package main
 
 import (
 	"fmt"
-	"github.com/go-chi/cors"
 	"log"
 	"net/http"
 	"os"
 	"spreewill-core/pkg/db"
 	"spreewill-core/pkg/services/auth"
+	"spreewill-core/pkg/services/comments"
 	"spreewill-core/pkg/services/customer"
+	"spreewill-core/pkg/services/post"
 	"spreewill-core/pkg/services/vendorx"
 	"spreewill-core/pkg/session"
+
+	"github.com/go-chi/cors"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -30,6 +33,8 @@ func main() {
 
 	vendorService := vendorx.NewVendorService(session)
 	customerService := customer.NewCustomerService(session)
+	postService := post.NewPostService(session)
+	commentService := comments.NewCommentService(session)
 
 	r := chi.NewRouter()
 
@@ -77,6 +82,26 @@ func main() {
 			r.Put("/", customerService.UpdateCustomer)
 			r.Delete("/{id}", customerService.DeleteCustomer)
 		})
+	})
+
+	r.Route("/api/posts", func(r chi.Router) {
+		r.Use(ValidateToken)
+		r.Post("/", postService.CreatePost)
+		r.Get("/{id}", postService.GetPost)
+		r.Get("/all", postService.GetPosts)
+		r.Put("/", postService.UpdatePost)
+		r.Delete("/{id}", postService.DeletePost)
+		r.Post("/like", postService.Like)
+		r.Post("/dislike", postService.Dislike)
+	})
+
+	r.Route("/api/comments", func(r chi.Router) {
+		r.Use(ValidateToken)
+		r.Post("/", commentService.CreateComment)
+		r.Get("/{id}", commentService.GetComment)
+		r.Get("/all", commentService.GetComments)
+		r.Put("/", commentService.UpdateComment)
+		r.Delete("/{id}", commentService.DeleteComment)
 	})
 
 	port := os.Getenv("PORT")

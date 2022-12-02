@@ -42,17 +42,16 @@ type (
 	Post struct {
 		mgm.DefaultModel `bson:",inline"`
 		Images           []Image   `json:"images,omitempty" bson:"images,omitempty"`
-		VendorID         uint      `json:"vendor_id,omitempty" bson:"vendor_id,omitempty"`
+		VendorID         string      `json:"vendor_id,omitempty" bson:"vendor_id,omitempty"`
 		Caption          string    `json:"caption,omitempty" bson:"caption,omitempty"`
-		Likes            uint      `json:"like,omitempty" bson:"like,omitempty"`
+		Likes            uint      `json:"likes,omitempty" bson:"likes,omitempty"`
 		Dislikes         uint      `json:"dislikes,omitempty" bson:"dislikes,omitempty"`
-		Views            uint      `json:"views,omitempty" bson:"views,omitempty"`
 		Comments         []Comment `json:"comments,omitempty" bson:"comments,omitempty"`
 	}
 
 	Comment struct {
 		mgm.DefaultModel `bson:",inline"`
-		PostID           uint      `json:"post_id,omitempty" bson:"post_id,omitempty"`
+		PostID           string      `json:"post_id,omitempty" bson:"post_id,omitempty"`
 		Content          string    `json:"content,omitempty" bson:"content,omitempty"`
 		DateTime         time.Time `json:"time,omitempty" bson:"time,omitempty"`
 		UserID           string    `json:"user_id,omitempty" bson:"user_id,omitempty"`
@@ -60,8 +59,8 @@ type (
 
 	Image struct {
 		mgm.DefaultModel `bson:",inline"`
-		PostID           uint
-		StoryID          uint
+		PostID           uint `json:"post_id,omitempty" bson:"post_id,omitempty"`
+		StoryID          uint `json:"story_id,omitempty" bson:"story_id,omitempty"`
 		Link             string `json:"link,omitempty" bson:"link,omitempty"`
 	}
 
@@ -81,4 +80,5 @@ type (
 	Entity interface {
 		Customer | Image | Post | Comment | Story | Vendor
 	}
+
 )
