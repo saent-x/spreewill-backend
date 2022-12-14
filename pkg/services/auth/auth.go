@@ -3,6 +3,7 @@ package auth
 import (
 	"encoding/json"
 	"net/http"
+	aws2 "spreewill-core/pkg/services/aws"
 	"spreewill-core/pkg/util"
 
 	cip "github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
@@ -19,7 +20,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cognitoClient, ok := r.Context().Value("CognitoClient").(*CognitoClient)
+	cognitoClient, ok := r.Context().Value("CognitoClient").(*aws2.CognitoClient)
 	if !ok {
 		util.SendError(w, http.StatusInternalServerError, "could not retrieve cognitoClient from context")
 		return
@@ -62,7 +63,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cognitoClient, ok := r.Context().Value("CognitoClient").(*CognitoClient)
+	cognitoClient, ok := r.Context().Value("CognitoClient").(*aws2.CognitoClient)
 	if !ok {
 		util.SendError(w, http.StatusInternalServerError, "could not retrieve cognitoClient from context")
 		return
@@ -103,7 +104,7 @@ func VerifyUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cognitoClient, ok := r.Context().Value("CognitoClient").(*CognitoClient)
+	cognitoClient, ok := r.Context().Value("CognitoClient").(*aws2.CognitoClient)
 	if !ok {
 		util.SendError(w, http.StatusInternalServerError, "could not retrieve cognitoClient from context")
 		return
@@ -135,7 +136,7 @@ func ForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cognitoClient, ok := r.Context().Value("CognitoClient").(*CognitoClient)
+	cognitoClient, ok := r.Context().Value("CognitoClient").(*aws2.CognitoClient)
 	if !ok {
 		util.SendError(w, http.StatusInternalServerError, "could not retrieve cognitoClient from context")
 		return
@@ -166,7 +167,7 @@ func ConfirmForgotPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cognitoClient, ok := r.Context().Value("CognitoClient").(*CognitoClient)
+	cognitoClient, ok := r.Context().Value("CognitoClient").(*aws2.CognitoClient)
 	if !ok {
 		util.SendError(w, http.StatusInternalServerError, "could not retrieve cognitoClient from context")
 		return

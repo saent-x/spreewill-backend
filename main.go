@@ -7,6 +7,7 @@ import (
 	"os"
 	"spreewill-core/pkg/db"
 	"spreewill-core/pkg/services/auth"
+	"spreewill-core/pkg/services/aws"
 	"spreewill-core/pkg/services/comments"
 	"spreewill-core/pkg/services/customer"
 	"spreewill-core/pkg/services/post"
@@ -26,7 +27,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	cognitoClient := auth.Init()
+	cognitoClient := aws.Init()
 	db.Init()
 
 	session := session.CreateSession()
@@ -56,6 +57,8 @@ func main() {
 		r.Post("/signup", auth.SignUp)
 		r.Post("/verify", auth.VerifyUser)
 		r.Post("/signin", auth.SignIn)
+		r.Post("/forgotpassword", auth.ForgotPassword)
+		r.Post("/confirmforgotpassword", auth.ConfirmForgotPassword)
 	})
 
 	r.Route("/api/vendor", func(r chi.Router) {
@@ -64,10 +67,10 @@ func main() {
 		r.Group(func(r chi.Router) {
 			r.Use(ValidateToken)
 
-			r.Get("/{id}", vendorService.GetVendor)
+			r.Get("/", vendorService.GetVendor)
 			r.Get("/all", vendorService.GetVendors)
 			r.Put("/", vendorService.UpdateVendor)
-			r.Delete("/{id}", vendorService.DeleteVendor)
+			r.Delete("/", vendorService.DeleteVendor)
 		})
 	})
 
@@ -77,10 +80,10 @@ func main() {
 		r.Group(func(r chi.Router) {
 			r.Use(ValidateToken)
 
-			r.Get("/{id}", customerService.GetCustomer)
+			r.Get("/", customerService.GetCustomer)
 			r.Get("/all", customerService.GetCustomers)
 			r.Put("/", customerService.UpdateCustomer)
-			r.Delete("/{id}", customerService.DeleteCustomer)
+			r.Delete("/", customerService.DeleteCustomer)
 		})
 	})
 
