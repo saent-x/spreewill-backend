@@ -59,6 +59,7 @@ func main() {
 		r.Post("/signin", auth.SignIn)
 		r.Post("/forgotpassword", auth.ForgotPassword)
 		r.Post("/confirmforgotpassword", auth.ConfirmForgotPassword)
+		r.Post("/resendtoken", auth.ResendConfirmationToken)
 	})
 
 	r.Route("/api/vendor", func(r chi.Router) {

@@ -2,6 +2,7 @@ package auth
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	aws2 "spreewill-core/pkg/services/aws"
 	"spreewill-core/pkg/util"
@@ -181,6 +182,41 @@ func ConfirmForgotPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp, err := cognitoClient.ConfirmForgotPassword(r.Context(), cognitoUser)
+
+	if err != nil {
+		util.SendError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	util.SendSuccess(w, http.StatusOK, resp)
+	return
+}
+
+func ResendConfirmationToken(w http.ResponseWriter, r *http.Request) {
+	var req map[string]interface{}
+
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		util.SendError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	cognitoClient, ok := r.Context().Value("CognitoClient").(*aws2.CognitoClient)
+	if !ok {
+		util.SendError(w, http.StatusInternalServerError, "could not retrieve cognitoClient from context")
+		return
+	}
+
+	email := req["email"].(string)
+
+	fmt.Println(email)
+
+	cognitoUser := &cip.ResendConfirmationCodeInput{
+		ClientId: &cognitoClient.AppClientID,
+		Username: &email,
+	}
+
+	resp, err := cognitoClient.ResendConfirmationCode(r.Context(), cognitoUser)
 
 	if err != nil {
 		util.SendError(w, http.StatusBadRequest, err.Error())

@@ -45,6 +45,7 @@ require (
 	github.com/flosch/pongo2/v4 v4.0.2 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.7.7 // indirect
+	github.com/gmarik/go-erd v0.0.0-20170331193134-80f366849d69 // indirect
 	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/go-chi/jwtauth v1.2.0 // indirect
 	github.com/go-chi/jwtauth/v5 v5.0.2 // indirect
